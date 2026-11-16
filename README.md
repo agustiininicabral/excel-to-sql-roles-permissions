@@ -38,6 +38,12 @@ mysql -u root -p < sql/001_create_schema.sql
 PYTHONPATH=src python -m roles_migration.main --input data/source/authorization_source.xlsx
 ```
 
+## Visual overview
+
+![RBAC migration architecture](docs/architecture.svg)
+
+![Sample validation summary](docs/quality-summary.svg)
+
 ## Validation rules
 
 - Unique user IDs, role codes, and permission codes.
