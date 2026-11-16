@@ -1,0 +1,10 @@
+[project]
+name = "excel-to-sql-roles-permissions"
+version = "1.0.0"
+description = "Excel-to-MySQL relational roles and permissions migration practice project"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
