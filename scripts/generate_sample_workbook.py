@@ -41,6 +41,7 @@ COLUMNS={
 }
 
 def main():
+    OUT.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(OUT,engine="openpyxl") as writer:
         for sheet,rows in SHEETS.items():
             pd.DataFrame(rows,columns=COLUMNS[sheet]).to_excel(writer,sheet_name=sheet,index=False)
