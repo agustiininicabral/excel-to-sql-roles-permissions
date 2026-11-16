@@ -31,7 +31,7 @@ def transform_workbook(path: str | Path):
         raw[key]=frame[columns].copy()
 
     accepted={}; rejected={}
-    users=[]; bad=[]; seen=set()
+    users=[]; bad=[]; seen=set(); seen_emails=set()
     for row in raw["users"].to_dict("records"):
         uid=_text(row["user_id"]); email=(_text(row["email"]) or "").lower()
         name=_text(row["full_name"]); active=(_text(row["is_active"]) or "").lower()
@@ -42,9 +42,10 @@ def transform_workbook(path: str | Path):
         if not name: reasons.append("missing_full_name")
         if active not in {"0","1","true","false"}: reasons.append("invalid_is_active")
         if uid in seen and uid is not None: reasons.append("duplicate_user_id")
+        if email and email in seen_emails: reasons.append("duplicate_email")
         record={"user_id":uid,"email":email,"full_name":name,"is_active":active in {"1","true"}}
         if reasons: bad.append({**record,"rejection_reason":"|".join(reasons)})
-        else: seen.add(uid); users.append(record)
+        else: seen.add(uid); seen_emails.add(email); users.append(record)
     accepted["users"]=pd.DataFrame(users); rejected["users"]=pd.DataFrame(bad)
     user_ids={r["user_id"] for r in users}
 
@@ -61,16 +62,17 @@ def transform_workbook(path: str | Path):
     accepted["roles"]=pd.DataFrame(roles); rejected["roles"]=pd.DataFrame(bad)
     role_codes={r["role_code"] for r in roles}
 
-    permissions=[]; bad=[]; seen=set()
+    permissions=[]; bad=[]; seen=set(); seen_resource_actions=set()
     for row in raw["permissions"].to_dict("records"):
         code=(_text(row["permission_code"]) or "").lower()
         resource=(_text(row["resource"]) or "").lower(); action=(_text(row["action"]) or "").lower()
         reasons=[]
         if not code or not resource or not action: reasons.append("missing_permission_fields")
         if code in seen: reasons.append("duplicate_permission_code")
+        if (resource,action) in seen_resource_actions: reasons.append("duplicate_resource_action")
         record={"permission_code":code,"resource":resource,"action":action}
         if reasons: bad.append({**record,"rejection_reason":"|".join(reasons)})
-        else: seen.add(code); permissions.append(record)
+        else: seen.add(code); seen_resource_actions.add((resource,action)); permissions.append(record)
     accepted["permissions"]=pd.DataFrame(permissions); rejected["permissions"]=pd.DataFrame(bad)
     permission_codes={r["permission_code"] for r in permissions}
 
