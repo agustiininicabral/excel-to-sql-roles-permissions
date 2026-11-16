@@ -54,7 +54,7 @@ PYTHONPATH=src python -m roles_migration.main --input data/source/authorization_
 - Assignment dates must parse correctly.
 - All accepted rows are loaded in dependency order inside one transaction.
 
-Run tests with `pytest`. CI regenerates the workbook, executes tests and a dry-run, and uploads validation reports as an artifact.
+Run tests with `pytest`. CI starts an ephemeral MySQL 8.0 service, regenerates the workbook, runs tests and a dry-run, applies the schema, loads all five tables, verifies persisted counts and foreign-key integrity, and uploads validation reports. `scripts/apply_schema.py` and `scripts/verify_database.py` reproduce the database checks.
 
 ## Contents
 
